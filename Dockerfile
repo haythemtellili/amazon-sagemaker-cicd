@@ -8,3 +8,4 @@ COPY serve-script.py /usr/bin/serve
 RUN chmod 755 /usr/bin/train /usr/bin/serve
 
 EXPOSE 8080
+ 
