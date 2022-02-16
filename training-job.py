@@ -1,12 +1,13 @@
 #!/usr/bin/env python
-
 import requests
 import os
+import pandas as pd
 
+from sagemaker.analytics import TrainingJobAnalytics
 import sagemaker
 from sagemaker.estimator import Estimator
 import boto3
-
+import s3fs
 
 session = sagemaker.Session(boto3.session.Session())
 
@@ -42,7 +43,7 @@ boston_estimator = Estimator(
     output_path=output_folder_s3_uri,
     code_location=source_folder,
     base_job_name='boston-housing-model',
-    hyperparameters={'nestimators': 150},
+    hyperparameters={'nestimators': 50},
     environment={
              "BUCKET_NAME": BUCKET_NAME,
              "PREFIX": PREFIX,
@@ -59,6 +60,14 @@ boston_estimator.fit({'training': training_data_s3_uri,
 training_job_name = boston_estimator.latest_training_job.name
 hyperparameters_dictionary = boston_estimator.hyperparameters()
 
+
+report = pd.read_csv(f's3://{BUCKET_NAME}/{PREFIX}/reports.csv')
+while(len(report[report['commit_hash']==GITHUB_SHA]) == 0):
+    report = pd.read_csv(f's3://{BUCKET_NAME}/{PREFIX}/reports.csv')
+
+res = report[report['commit_hash']==GITHUB_SHA]
+metrics_dataframe = res[['Train_MSE', 'Validation_MSE']]
+
 message = (f"## Training Job Submission Report\n\n"
            f"Training Job name: '{training_job_name}'\n\n"
             "Model Artifacts Location:\n\n"
@@ -67,7 +76,10 @@ message = (f"## Training Job Submission Report\n\n"
             "See the Logs in a few minute at: "
            f"[CloudWatch](https://{REGION}.console.aws.amazon.com/cloudwatch/home?region={REGION}#logStream:group=/aws/sagemaker/TrainingJobs;prefix={training_job_name})\n\n"
             "If you merge this pull request the resulting endpoint will be avaible this URL:\n\n"
-           f"'https://runtime.sagemaker.{REGION}.amazonaws.com/endpoints/{training_job_name}/invocations'\n\n")
+           f"'https://runtime.sagemaker.{REGION}.amazonaws.com/endpoints/{training_job_name}/invocations'\n\n"
+           f"## Training Job Performance Report\n\n"
+           f"{metrics_dataframe.to_markdown(index=False)}\n\n"
+          )
 print(message)
 
 # Write metrics to file
