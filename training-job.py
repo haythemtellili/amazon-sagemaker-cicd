@@ -43,7 +43,7 @@ boston_estimator = Estimator(
     output_path=output_folder_s3_uri,
     code_location=source_folder,
     base_job_name='boston-housing-model',
-    hyperparameters={'nestimators': 50},
+    hyperparameters={'nestimators': 70},
     environment={
              "BUCKET_NAME": BUCKET_NAME,
              "PREFIX": PREFIX,
