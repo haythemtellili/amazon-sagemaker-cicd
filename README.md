@@ -3,3 +3,4 @@ A CI/CD pipeline with SageMaker and Github that helps you to collaborate on a Ma
 
 ## Usage
 For a demo of this project see my blog post.
+https://medium.com/@haythemtellili/machine-learning-ci-cd-pipeline-with-github-actions-and-amazon-sagemaker-f99818b7506a
