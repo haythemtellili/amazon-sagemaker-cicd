@@ -22,6 +22,7 @@ ACCOUNT_ID = session.boto_session.client(
 # Replace with your desired training instance
 training_instance = 'ml.m5.large'
 
+
 # Replace with your data s3 path
 training_data_s3_uri = 's3://{}/{}/boston-housing-training.csv'.format(
     BUCKET_NAME, PREFIX)
@@ -51,7 +52,7 @@ boston_estimator = Estimator(
              "REGION": REGION,},
 
     tags=[{"Key": "email",
-           "Value": "haythemaws@gmail.com"}])
+           "Value": "khatri.gopal@gmail.com"}])
 
 boston_estimator.fit({'training': training_data_s3_uri,
                       'validation': validation_data_s3_uri}, wait=False)
